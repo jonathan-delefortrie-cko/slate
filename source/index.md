@@ -1,168 +1,209 @@
 ---
-title: API Reference
-
-language_tabs:
-  - shell
-  - ruby
-  - python
+title: CKO Graph Documentation
 
 toc_footers:
   - <a href='#'>Sign Up for a Developer Key</a>
   - <a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a>
-
-includes:
-  - errors
 
 search: true
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+> Set the library on the document:
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](http://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
-
-# Authentication
-
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+```html
+<script src="./d3.v3.min.js"></script>
+<script src="./CKOGraph.min.js"></script>
 ```
 
-```python
-import 'kittn'
+Welcome to the CKO Graph Library !!!
 
-api = Kittn.authorize('meowmeowmeow')
+The current version of the library is implementing two types of graph. (Line Chart/Bar Chart)  
+The Library contain three differents class (TooltipPublisher/ChartStorage/Render).  
+The CHECKOUT is the main class to handle all of those.  
+
+Please see the following parts below to have a global view on how to use the library.
+
+# Instantiate
+
+> Instantiation with the minimum variable:
+
+```javascript
+var cko = CKOGRAPH.createChart(); // Line Chart
+var cko = CKOGRAPH.createChart('Bar'); // Bar Chart
+var cko = CKOGRAPH.createChart('Line'); // Line Chart
 ```
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+> Instantiation with the maximum variable:
+
+```javascript
+
+var data = []; // Array contening the plot x and y : [x,y]
+var id = 'myId'; // Necessary to remove a plot dynamicaly
+var color = '#fffeee'; // Color hexadecimal
+
+var options = {
+    element: 'myContainer'
+    ticks: 5,
+    dateFormat: '%a %d %H:%M:%S',
+    width: null,
+    height: null,
+    background: true,
+    axes: {
+        xAxis: {
+            visible: true,
+            height: 45,
+            padding: 0
+        },
+        yAxis: {
+            visible: true,
+            height: 65,
+            padding: 25
+        }
+    }
+};
+
+var cko = CKOGRAPH.createChart('Line',data,id,color,options);
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+The defaults options are set on the current design of Checkout.
+please, feel free to arrange the graph as you need.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+### Instance parameters
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+Parameter | Type | Description
+--------- | ------- | -----------
+data | array | Data is an optional parameters, by setting this you start automatically the render.
+id | string | Id is an optional parameters, usefull to handle the plot.
+color | array | Color is an optional parameters associated to the plot.
+options | object | Override the default value, see the structure below.
 
-`Authorization: meowmeowmeow`
+### Optional attributes
+
+Attribute | Type | Description
+--------- | ---- | -----------
+element | string | The string should be an id, otherwise we set the parent element by default.
+ticks | number | Divisor for the Y axis, useful to minimize the render.
+dateFormat | string | The date format option is based on the d3 js Library.
+width | number/null | The null value give automatically the parent size.
+height | number/null | The null value give automatically the parent size.
+background | true/false | Background state.
+axes.(x/y)Axis.visible | true/false | Axis state.
+axes.(x/y)Axis.height | number | Axis size : Weight of the axis.
+axes.(x/y)Axis.padding | number | Axis padding : Where start and stop the axis.
+
+`* A default color is set automatically if the parameters is missing during the plot installation`
 
 <aside class="notice">
-You must replace `meowmeowmeow` with your personal API key.
+Id, data and color are associated please be aware by passing a color parameters you must have a data associate. Otherwise the parameter itself is useless.
 </aside>
 
-# Kittens
+# Methods
 
-## Get All Kittens
+> Some examples of methods:
 
-```ruby
-require 'kittn'
+```javascript
+cko.addElement(id,data,color); // Increment the graph with a new plot (line/bar)
+cko.removeElement(id); // Remove the plot by its id
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+cko.showBackground();
+cko.hideBackground();
+
+cko.setWidth();
+cko.setHeight();
+
+cko.clear(); // Clear storage
+cko.refresh(); // Redraw entirely the canvas
 ```
 
-```python
-import 'kittn'
+Those chain methods useful to edit the graph after the first loading.
 
-api = Kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+### Chain methods
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
+Method | Parameters | Description
+------ | ---------- | -----------
+addElement | id/data/color | Method to add a plot.
+removeElement | id/data/color | Method to remove the plot by id.
+showBackground | empty | Display the background.
+hideBackground | empty | Hide the the background.
+setWidth | number | Resize the width and force it width.
+setHeight | number | Resize the height and force it height.
+clear | object | Clear entirely the graph / remove all the plots.
+refresh | object | Redraw the canvas based on the actuel values.
 
-> The above command returns JSON structured like this:
+`* Use the refresh method and pass the parameters in it if you want change entirely the design`
 
-```json
+<aside class="success">
+By passing the optional object parameters in the cleaner and refresh method it will redraw the canvas based on the new parameters dynamically.
+</aside>
+
+<aside class="notice">
+You must know by each call of a method you automatically refresh the canvas. You can potentially reset the options object and push it in the refresh method to minimize its the time render.
+</aside>
+
+# Data
+
+The format data is an array which contain arrays with date and value for each entry. It is possible to add the hours in the date for more precision. See the following examples.
+
+### Format of data
+
+Entry | Axis | Type
+----- | ---- | ----
+1 | x | date
+2 | y | value
+
+`* The first entry should be a timestamp format`
+
+> Here is the array needed:
+
+```array
 [
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Isis",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
+  ["03/21/2013", "12"],
+  ["03/22/2013", "14"],
+  ["03/23/2013", "15"],
+  ["03/24/2013", "14"],
+  ["03/25/2013", "18"],
+  ["03/26/2013", "19"],
+  ["03/27/2013", "20"],
+  ["03/28/2013", "21"],
+  ["03/29/2013", "22"],
+  ["03/30/2013", "10"],
+  ["03/31/2013", "11"]
 ]
 ```
 
-This endpoint retrieves all kittens.
+> Example with hour:
 
-### HTTP Request
+```array
+[
+  ["03/21/2013 00:00:00", 12],
+  ["03/21/2013 01:00:00", 14],
+  ["03/21/2013 02:00:00", 15],
+  ["03/21/2013 03:00:00", 14],
+  ["03/21/2013 04:00:00", 18],
+  ["03/21/2013 05:00:00", 19],
+  ["03/21/2013 06:00:00", 20],
+  ["03/21/2013 07:00:00", 21],
+  ["03/21/2013 08:00:00", 22],
+  ["03/21/2013 09:00:00", 10],
+  ["03/21/2013 10:00:00", 11],
+  ["03/21/2013 11:00:00", 12],
+  ["03/21/2013 12:00:00", 14],
+  ["03/21/2013 13:00:00", 15],
+  ["03/21/2013 14:00:00", 14],
+  ["03/21/2013 15:00:00", 18],
+  ["03/21/2013 16:00:00", 19],
+  ["03/21/2013 17:00:00", 20],
+  ["03/21/2013 18:00:00", 21],
+  ["03/21/2013 19:00:00", 22],
+  ["03/21/2013 20:00:00", 10],
+  ["03/21/2013 21:00:00", 11],
+  ["03/21/2013 22:00:00", 11],
+  ["03/21/2013 23:00:00", 21]
+]
+```
 
-`GET http://example.com/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+<aside class="warning">
+Be aware that graph is a timeline of values given. The first column of this array should be the data with a date-time format and the second one the value.
 </aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import 'kittn'
-
-api = Kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/3"
-  -H "Authorization: meowmeowmeow"
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Isis",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">If you're not using an administrator API key, note that some kittens will return 403 Forbidden if they are hidden for admins only.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the cat to retrieve
-
